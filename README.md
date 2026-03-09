@@ -2,4 +2,5 @@
 - Nom:
 - Prénom:
 - url: 
+- url pocketbase : https://127.0.0.1:8004/_/
 
