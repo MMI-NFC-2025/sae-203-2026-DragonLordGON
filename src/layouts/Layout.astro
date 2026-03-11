@@ -1,20 +1,57 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+const { title, image = "/screenshot.avif", bottomColor = "#e3ddd3" } = Astro.props;
+
+
+const siteName = "FlyingTapfest";
+
+const titleHead = Astro.url.pathname === "/" ? siteName : `${title} — ${siteName}`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{titleHead}</title>
 	</head>
-	<body>
-		<slot />
+	
+	<body class="bg-amber-50">
+		<slot name="header">
+			<Header />
+		</slot>
+		{title && <h1 class="text-4xl font-bold ml-10 mt-5 mb-5 text-orange-600">{title}</h1>}
+		<div class="flex justify-center items-center mt-10 mb-10">
+			<svg xmlns="http://www.w3.org/2000/svg" width="133" height="137" viewBox="0 0 133 137" fill="none">
+				<g filter="url(#filter0_i_2004_792)">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M33.0978 0C49.8141 3.14515e-06 63.6854 12.1136 66.338 28.001C68.9904 12.1135 82.8618 8.14197e-05 99.5782 0H131.892C132.501 0.000223712 132.877 0.662867 132.563 1.18262L127.608 9.36914C118.32 24.7174 118.32 43.9194 127.608 59.2676L132.563 67.4541C132.674 67.6381 132.697 67.8394 132.655 68.0234C132.697 68.2075 132.674 68.4087 132.563 68.5928L127.608 76.7803C118.32 92.1285 118.32 111.33 127.608 126.678L132.563 134.865C132.877 135.385 132.501 136.047 131.892 136.047H99.5782C82.8616 136.047 68.9902 123.934 66.338 108.046C63.6858 123.934 49.8144 136.047 33.0978 136.047H0.785253C0.175616 136.047 -0.200863 135.385 0.113378 134.865L5.06846 126.678C14.3566 111.33 14.3567 92.1284 5.06846 76.7803L0.113378 68.5938C0.00199937 68.4097 -0.0218745 68.2075 0.0196282 68.0234C-0.0216243 67.8396 0.00215947 67.6379 0.113378 67.4541L5.06846 59.2676C14.3567 43.9195 14.3566 24.7182 5.06846 9.37012L0.113378 1.18262C-0.200968 0.662813 0.175578 -1.14709e-07 0.785253 0H33.0978ZM66.338 40.6348C64.035 54.4323 53.271 65.3805 39.5294 68.0234C53.2708 70.6663 64.0347 81.615 66.338 95.4121C68.6412 81.6153 79.4048 70.6667 93.1456 68.0234C79.4047 65.3801 68.641 54.4317 66.338 40.6348Z" fill="#E24B2C"/>
+				</g>
+				<defs>
+					<filter id="filter0_i_2004_792" x="0" y="0" width="136.676" height="140.047" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+					<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+					<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+					<feOffset dx="8" dy="4"/>
+					<feGaussianBlur stdDeviation="2"/>
+					<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+					<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.23 0"/>
+					<feBlend mode="normal" in2="shape" result="effect1_innerShadow_2004_792"/>
+					</filter>
+				</defs>
+			</svg>
+		</div>
+		<main class="content-surface">
+			<slot />
+		</main>
+		<Footer />
 	</body>
 </html>
+
 
 

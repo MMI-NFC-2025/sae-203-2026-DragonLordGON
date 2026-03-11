@@ -1,0 +1,46 @@
+﻿---
+const { title, bottomColor = "#E3DDD3" } = Astro.props;
+import logo from "../assets/logo.svg";
+
+
+const MAX_VIEWPORT = 2560; 
+const TILE_WIDTH = 106; 
+const tilesNeeded = Math.ceil(MAX_VIEWPORT / TILE_WIDTH) + 1;
+const bottomTiles = Array.from({ length: tilesNeeded });
+
+const navLinks = [
+	{ label: "Accueil", href: "/" },
+	{ label: "À propos", href: "/about" },
+	{ label: "Le festival", href: "/festival" },
+	{ label: "Programme", href: "/programme" },
+	{ label: "Artistes", href: "/artistes" },
+	{ label: "Scènes", href: "/scenes" },
+	{ label: "Infos pratiques", href: "/infos-pratiques" },
+	{ label: "Contact", href: "/contact" },
+];
+---
+
+<header class="site-header">
+	<div class="header-topbar">
+		<div class="header-logo">
+			<a href="/" aria-label="Retour a l'accueil" class="header-logo__link">
+				<img src={logo.src} alt="FtapFest logo" class="header-logo__image" />
+			</a>
+		</div>
+		<nav class="header-nav" aria-label="Navigation principale">
+			{navLinks.map((link) => (
+				<a href={link.href} class="header-nav__link">{link.label}</a>
+			))}
+		</nav>
+	</div>
+	<div class="header-bottom" aria-hidden="true">
+		<div class="header-bottom__track ml-[-20px]">
+			{bottomTiles.map(() => (
+				<svg class="header-bottom__tile" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
+					<path d="M51.7955 -3.9632e-07L54.2046 0C82.8104 4.70595e-06 106 20.5546 106 45.91L106 91H104.174H2.67029e-05L3.61907e-05 45.91C4.16467e-05 20.5546 23.1897 -5.10227e-06 51.7955 -3.9632e-07Z" fill={bottomColor}/>
+				</svg>
+			))}
+		</div>
+		<div class="header-bottom__seam-fix" style={`--seam-color: ${bottomColor}`}></div>
+	</div>
+</header>
