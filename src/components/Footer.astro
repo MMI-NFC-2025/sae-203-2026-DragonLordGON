@@ -29,22 +29,22 @@ const metaLinks = [
 ];
 ---
 
-<footer class="site-footer">
-	<div class="footer-top" aria-hidden="true">
-		<div class="footer-top__track mr-[-20px]">
+<footer class="relative flex flex-col bg-[var(--orange-600)] text-[var(--cream-50)]">
+	<div class="relative ml-[calc(var(--bump-width)*-1)] h-[var(--bump-height)] w-[calc(100%+var(--bump-width))] overflow-hidden bg-[var(--orange-600)]" aria-hidden="true">
+		<div class="mr-[-20px] flex h-full flex-nowrap justify-end">
 			{bottomTiles.map(() => (
-				<svg class="footer-top__tile" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
+				<svg class="mr-[-1px] block h-[var(--bump-height)] w-[var(--bump-width)] shrink-0" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
 					<path d="M54.2045 91L51.7954 91C23.1896 91 -3.41767e-05 70.4454 -2.6504e-05 45.09L-7.30332e-06 -9.26682e-06L1.826 -9.10718e-06L106 0L106 45.09C106 70.4454 82.8103 91 54.2045 91Z" fill={bottomColor}/>
 				</svg>
 			))}
 		</div>
-		<div class="footer-top__seam-fix" style={`--seam-color: ${bottomColor}`}></div>
+		<div class="pointer-events-none absolute top-0 right-0 left-0 h-px bg-[var(--seam-color,var(--sand-200))]" style={`--seam-color: ${bottomColor}`}></div>
 	</div>
-	<div class="footer-body">
-		<p class="footer-tagline">Entre ciel et terre, vivez l'expérience <span class="footer-tagline__highlight">Flying Tap Fest</span>.</p>
+	<div class="min-h-[5rem] px-6 py-8 md:px-8 md:py-9">
+		<p class="m-0 text-lg font-bold leading-[1.35] text-[var(--cream-50)]">Entre ciel et terre, vivez l'expérience <span class="text-[var(--gold-400)]">Flying Tap Fest</span>.</p>
     </div>
-	<div class="footer-body footer-body--nav">
-		 <div class="footer-mark">
+	<div class="flex items-start justify-between gap-6 mx-auto max-w-5xl w-full px-6 py-8 md:px-8 md:py-9">
+		 <div class="flex-shrink-0">
         	<svg xmlns="http://www.w3.org/2000/svg" width="133" height="137" viewBox="0 0 133 137" fill="none">
 			    <g filter="url(#filter0_i_2004_792)">
 				    <path fill-rule="evenodd" clip-rule="evenodd" d="M33.0978 0C49.8141 3.14515e-06 63.6854 12.1136 66.338 28.001C68.9904 12.1135 82.8618 8.14197e-05 99.5782 0H131.892C132.501 0.000223712 132.877 0.662867 132.563 1.18262L127.608 9.36914C118.32 24.7174 118.32 43.9194 127.608 59.2676L132.563 67.4541C132.674 67.6381 132.697 67.8394 132.655 68.0234C132.697 68.2075 132.674 68.4087 132.563 68.5928L127.608 76.7803C118.32 92.1285 118.32 111.33 127.608 126.678L132.563 134.865C132.877 135.385 132.501 136.047 131.892 136.047H99.5782C82.8616 136.047 68.9902 123.934 66.338 108.046C63.6858 123.934 49.8144 136.047 33.0978 136.047H0.785253C0.175616 136.047 -0.200863 135.385 0.113378 134.865L5.06846 126.678C14.3566 111.33 14.3567 92.1284 5.06846 76.7803L0.113378 68.5938C0.00199937 68.4097 -0.0218745 68.2075 0.0196282 68.0234C-0.0216243 67.8396 0.00215947 67.6379 0.113378 67.4541L5.06846 59.2676C14.3567 43.9195 14.3566 24.7182 5.06846 9.37012L0.113378 1.18262C-0.200968 0.662813 0.175578 -1.14709e-07 0.785253 0H33.0978ZM66.338 40.6348C64.035 54.4323 53.271 65.3805 39.5294 68.0234C53.2708 70.6663 64.0347 81.615 66.338 95.4121C68.6412 81.6153 79.4048 70.6667 93.1456 68.0234C79.4047 65.3801 68.641 54.4317 66.338 40.6348Z" fill={bottomColor}/>
@@ -63,14 +63,14 @@ const metaLinks = [
 		    	</defs>
 		    </svg>
          </div>
-		<nav class="footer-nav" aria-label="Navigation principale">
-			<div class="footer-nav__grid">
+		<nav class="w-full flex justify-end" aria-label="Navigation principale">
+			<div class="flex flex-wrap justify-end gap-10 w-full max-w-5xl">
 				{navSections.map((section) => (
-					<div class="footer-nav__section">
-						<p class="footer-nav__heading">{section.title}</p>
-						<div class="footer-nav__links">
+					<div class="flex flex-col min-w-[10rem] gap-2 text-right">
+						<p class="m-0 text-sm font-extrabold tracking-widest uppercase text-[var(--gold-400)]">{section.title}</p>
+						<div class="flex flex-col gap-2 items-end">
 							{section.links.map((link) => (
-								<a href={link.href} class="footer-nav__link">{link.label}</a>
+								<a href={link.href} class="text-[var(--cream-50)] text-base font-bold no-underline leading-[1.2] transition-colors hover:text-[var(--gold-400)]">{link.label}</a>
 							))}
 						</div>
 					</div>
@@ -78,13 +78,13 @@ const metaLinks = [
 			</div>
 		</nav>
 	</div>
-	<div class="footer-body footer-body--meta">
-		<nav class="footer-meta" aria-label="Liens légaux et réseaux">
+	<div class="min-h-[5rem] px-6 py-8 md:px-8 md:py-9 pt-1">
+		<nav class="flex justify-center items-center gap-4 flex-wrap" aria-label="Liens légaux et réseaux">
 			{metaLinks.map((link) => (
-				<a href={link.href} class="footer-meta__link" target={link.external ? "_blank" : undefined} rel={link.external ? "noreferrer noopener" : undefined}>{link.label}</a>
+				<a href={link.href} class="text-xs font-semibold text-[var(--cream-100)] no-underline opacity-90 transition-all hover:text-[var(--gold-400)] hover:opacity-100" target={link.external ? "_blank" : undefined} rel={link.external ? "noreferrer noopener" : undefined}>{link.label}</a>
 			))}
-			<a href="mailto:contact@flyingtapfest.fr" class="footer-meta__link">contact@flyingtapfest.fr</a>
-            <a href="FTapFestcopyright" class="footer-meta__link">© 2026 Flying Tap Fest</a>
+			<a href="mailto:contact@flyingtapfest.fr" class="text-xs font-semibold text-[var(--cream-100)] no-underline opacity-90 transition-all hover:text-[var(--gold-400)] hover:opacity-100">contact@flyingtapfest.fr</a>
+            <a href="FTapFestcopyright" class="text-xs font-semibold text-[var(--cream-100)] no-underline opacity-90 transition-all hover:text-[var(--gold-400)] hover:opacity-100">© 2026 Flying Tap Fest</a>
 		</nav>
 	</div>
 </footer>

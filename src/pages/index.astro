@@ -1,17 +1,138 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import HomeCard from "../layouts/HomeCard.astro";
+import logo from "../assets/logo.svg";
+import unionIcon from "../assets/union.svg";
+import calendarIcon from "../assets/calendar.svg";
+import musiqueIcon from "../assets/musique.svg";
+import ticketIcon from "../assets/ticket.svg";
+import spotify from "../assets/spotify.webp";
+import tacos from "../assets/chamastacos.webp";
+import lidl from "../assets/lidl.webp";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
-const title = "Accueil";
+const { title, image = "/screenshot.avif", bottomColor = "#e3ddd3" } = Astro.props;
+const siteName = "FlyingTapfest";
+const titleHead = Astro.url.pathname === "/" ? siteName : `${title} — ${siteName}`;
+
+//HEADER
+const MAX_VIEWPORT = 2560; 
+const TILE_WIDTH = 106; 
+const tilesNeeded = Math.ceil(MAX_VIEWPORT / TILE_WIDTH) + 1;
+const bottomTiles = Array.from({ length: tilesNeeded });
+
+const navLinks = [
+	{ label: "Accueil", href: "/" },
+	{ label: "À propos", href: "/about" },
+	{ label: "Le festival", href: "/festival" },
+	{ label: "Programme", href: "/programme" },
+	{ label: "Artistes", href: "/artistes" },
+	{ label: "Scènes", href: "/scenes" },
+	{ label: "Infos pratiques", href: "/infos-pratiques" },
+	{ label: "Contact", href: "/contact" },
+];
 ---
 
-<Layout title={title}>
-	<Header slot="header">
-		
-	</Header>
-	<p>Bienvenue au Flying Tap Fest.</p>
-</Layout>
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap" rel="stylesheet" />
+		<link rel="icon" type="image/svg+xml" href={logo.src} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{titleHead}</title>
+	</head>
+	
+	<body>
+		<header class="relative z-20 flex shrink-0 flex-col bg-[var(--orange-600)] text-[var(--cream-50)]">
+			<div class="flex items-center justify-between gap-4 px-6 py-5 md:px-8 md:py-7">
+				<div class="flex min-w-0 items-center gap-[0.6rem]">
+					<div>
+						<a href="/" aria-label="Retour a l'accueil" class="inline-block rounded-lg transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--cream-50)] hover:[&>img]:-translate-y-0.5 hover:[&>img]:scale-105 hover:[&>img]:drop-shadow-[0_8px_10px_var(--shadow-ink-22)] focus-visible:[&>img]:-translate-y-0.5 focus-visible:[&>img]:scale-105">
+							<img src={logo.src} alt="FtapFest logo" class="block h-auto w-[clamp(120px,12vw,150px)] transition-all duration-200" />
+						</a>
+					</div>
+					<div class="flex flex-col items-start gap-[0.6rem]">
+						<p class="m-0 whitespace-nowrap text-left text-base font-bold leading-[1.2] text-[var(--cream-50)] opacity-95 md:text-[1.08rem]">Un festival entre <span class="text-[var(--gold-400)]">Ciel</span> et <span class="text-[var(--gold-400)]">Terre</span></p>
+						<a href="/billetterie" class="inline-flex min-h-[3.55rem] min-w-[min(23.25rem,78vw)] items-center justify-center rounded-[0.45rem] bg-[var(--sand-200)] px-6 py-[0.7rem] text-[1.04rem] font-extrabold uppercase tracking-[0.12em] text-[var(--orange-600)] no-underline transition-all duration-200 hover:-translate-y-px hover:bg-[var(--cream-50)] hover:drop-shadow-[0_6px_10px_var(--shadow-ink-22)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--cream-50)]">Accéder à la billetterie</a>
+					</div>
+				</div>
+
+				<nav class="ml-auto flex flex-wrap justify-end gap-[1.2rem]" aria-label="Navigation principale">
+					{navLinks.map((link) => (
+						<a href={link.href} class="relative inline-block text-[1.02rem] font-bold leading-none text-[var(--cream-50)] no-underline transition-all duration-200 after:absolute after:left-0 after:bottom-[-0.28rem] after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[var(--cream-50)] after:transition-transform after:duration-200 hover:-translate-y-0.5 hover:text-[var(--cream-100)] hover:after:scale-x-100 md:text-[1.12rem]">{link.label}</a>
+					))}
+				</nav>
+			</div>
+			<div class="relative z-10 order-3 mt-0 ml-0 h-[var(--bump-height)] w-[calc(100%+var(--bump-width))] overflow-hidden bg-[var(--orange-600)]" aria-hidden="true">
+				<div class="ml-[-20px] flex h-full flex-nowrap">
+					{bottomTiles.map(() => (
+						<svg class="mr-[-1px] block h-[var(--bump-height)] w-[var(--bump-width)] shrink-0" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
+							<path d="M51.7955 -3.9632e-07L54.2046 0C82.8104 4.70595e-06 106 20.5546 106 45.91L106 91H104.174H2.67029e-05L3.61907e-05 45.91C4.16467e-05 20.5546 23.1897 -5.10227e-06 51.7955 -3.9632e-07Z" fill={bottomColor}/>
+						</svg>
+					))}
+				</div>
+				<div class="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-[var(--seam-color,var(--sand-200))]" style={`--seam-color: ${bottomColor}`}></div>
+			</div>
+		</header>
+		<div class="flex justify-center items-center mt-10 mb-10">
+			<h1 class="text-5xl font-bold">6 & 7 JUIN 2026</h1>
+		</div>
+		<div class="ml-10 mt-20"> 
+			<h2 class="text-3xl font-bold text-orange-600">Découvrez la force d’un pas de danse bien rythmé </h2>
+			<a class="text-xl text-gray-600 hover:text-blue-500" href="/programme">En deux jours, vivez un festival mêlant claquettes, musique, ateliers et spectacles de drones lumineux. </a>
+		</div>
+
+		<section class="px-4 pt-10 pb-16 md:px-8 md:pt-12 md:pb-20" aria-label="Raccourcis">
+			<div class="mx-auto mt-10 mb-20 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
+				<HomeCard
+					title="Le festival"
+					description="Découvrez l'histoire et l'univers du festival"
+					buttonLabel="À propos"
+					buttonHref="/about"
+					iconSrc={unionIcon.src}
+				/>
+				<HomeCard
+					title="Programme"
+					description="Consultez les concerts, ateliers et temps forts des deux jours"
+					buttonLabel="Voir le Programme"
+					buttonHref="/programme"
+					iconSrc={calendarIcon.src}
+				/>
+				<HomeCard
+					title="Artistes"
+					description="Découvrez les artistes qui feront vibrer le festival"
+					buttonLabel="Voir les Artistes"
+					buttonHref="/artistes"
+					iconSrc={musiqueIcon.src}
+				/>
+				<HomeCard
+					title="Billetterie"
+					description=" Achetez vos billets pour les deux jours du festival"
+					buttonLabel="Accéder à la billetterie"
+					buttonHref="/billetterie"
+					iconSrc={ticketIcon.src}
+				/>
+			</div>
+			<div class="mx-auto mt-6 flex w-full max-w-5xl flex-col items-center gap-6">
+				<h2 class="text-3xl font-bold text-orange-600">Nos Partenaires</h2>
+				<div class="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+					<img src={spotify.src} alt="Spotify" class="h-16 w-auto object-contain md:h-20" />
+					<img src={tacos.src} alt="Chamas Tacos" class="h-16 w-auto object-contain md:h-20" />
+					<img src={lidl.src} alt="Lidl" class="h-16 w-auto object-contain md:h-20" />
+				</div>
+			</div>
+		</section>
+		<main class="relative z-[1] bg-[var(--sand-200)] px-4 py-8 md:px-8 md:py-[2.5rem]">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
+
 
 

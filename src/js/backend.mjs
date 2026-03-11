@@ -60,12 +60,6 @@ export async function getArtistesBySceneNom(sceneNom) {
 
 export async function createRecord(collection, data) {
     try {
-        // Message d'alerte si empty
-        const emptyFields = Object.keys(data).filter(key => !data[key]);
-        if (emptyFields.length > 0) {
-            console.warn(`⚠️ Création dans ${collection} : Les champs suivants sont vides :`, emptyFields);
-        }
-
         return await pb.collection(collection).create(data);
     } catch (error) {
         console.error(`Erreur création ${collection}:`, error);
@@ -76,17 +70,7 @@ export async function createRecord(collection, data) {
 
 export async function updateRecord(collection, id, data) {
     try {
-        // On evite d'effacer les données existants
-        const cleanData = new FormData();
-        
-        for (const [key, value] of Object.entries(data)) {
-            // ajout des champs non vides
-            if (value !== "" && value !== null && value !== undefined) {
-                cleanData.append(key, value);
-            }
-        }
-
-        return await pb.collection(collection).update(id, cleanData);
+        return await pb.collection(collection).update(id, data);
     } catch (error) {
         console.error("Erreur lors de la modification :", error);
         throw error;

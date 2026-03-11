@@ -20,27 +20,27 @@ const navLinks = [
 ];
 ---
 
-<header class="site-header">
-	<div class="header-topbar">
-		<div class="header-logo">
-			<a href="/" aria-label="Retour a l'accueil" class="header-logo__link">
-				<img src={logo.src} alt="FtapFest logo" class="header-logo__image" />
+<header class="relative z-20 flex shrink-0 flex-col bg-[var(--orange-600)] text-[var(--cream-50)]">
+	<div class="flex items-center justify-between gap-4 px-6 py-5 md:px-8 md:py-7">
+		<div>
+			<a href="/" aria-label="Retour a l'accueil" class="inline-block rounded-lg transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--cream-50)] hover:[&>img]:-translate-y-0.5 hover:[&>img]:scale-105 hover:[&>img]:drop-shadow-[0_8px_10px_var(--shadow-ink-22)] focus-visible:[&>img]:-translate-y-0.5 focus-visible:[&>img]:scale-105">
+				<img src={logo.src} alt="FtapFest logo" class="block h-auto w-[clamp(120px,12vw,150px)] transition-all duration-200" />
 			</a>
 		</div>
-		<nav class="header-nav" aria-label="Navigation principale">
+		<nav class="ml-auto flex flex-wrap justify-end gap-[1.2rem]" aria-label="Navigation principale">
 			{navLinks.map((link) => (
-				<a href={link.href} class="header-nav__link">{link.label}</a>
+				<a href={link.href} class="relative inline-block text-[1.02rem] font-bold leading-none text-[var(--cream-50)] no-underline transition-all duration-200 after:absolute after:left-0 after:bottom-[-0.28rem] after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[var(--cream-50)] after:transition-transform after:duration-200 hover:-translate-y-0.5 hover:text-[var(--cream-100)] hover:after:scale-x-100 md:text-[1.12rem]">{link.label}</a>
 			))}
 		</nav>
 	</div>
-	<div class="header-bottom" aria-hidden="true">
-		<div class="header-bottom__track ml-[-20px]">
+	<div class="relative z-10 order-3 mt-0 ml-0 h-[var(--bump-height)] w-[calc(100%+var(--bump-width))] overflow-hidden bg-[var(--orange-600)]" aria-hidden="true">
+		<div class="ml-[-20px] flex h-full flex-nowrap">
 			{bottomTiles.map(() => (
-				<svg class="header-bottom__tile" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
+				<svg class="mr-[-1px] block h-[var(--bump-height)] w-[var(--bump-width)] shrink-0" xmlns="http://www.w3.org/2000/svg" width="106" height="91" viewBox="0 0 106 91" fill="none">
 					<path d="M51.7955 -3.9632e-07L54.2046 0C82.8104 4.70595e-06 106 20.5546 106 45.91L106 91H104.174H2.67029e-05L3.61907e-05 45.91C4.16467e-05 20.5546 23.1897 -5.10227e-06 51.7955 -3.9632e-07Z" fill={bottomColor}/>
 				</svg>
 			))}
 		</div>
-		<div class="header-bottom__seam-fix" style={`--seam-color: ${bottomColor}`}></div>
+		<div class="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-[var(--seam-color,var(--sand-200))]" style={`--seam-color: ${bottomColor}`}></div>
 	</div>
 </header>

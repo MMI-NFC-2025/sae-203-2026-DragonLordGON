@@ -1,0 +1,35 @@
+---
+type Props = {
+	title: string;
+	description: string;
+	buttonLabel: string;
+	buttonHref: string;
+	iconSrc?: string;
+};
+
+const {
+	title,
+	description,
+	buttonLabel,
+	buttonHref,
+	iconSrc = unionIcon.src,
+} = Astro.props as Props;
+import unionIcon from "../assets/union.svg";
+---
+
+<article
+	class="flex flex-col items-center justify-start gap-4 aspect-square w-full max-w-[24rem] justify-self-center rounded-[0.8rem] border-2 bg-[var(--sand-200)] p-6 text-center"
+	style="border-color: color-mix(in srgb, var(--orange-600) 14%, transparent); box-shadow: 0 8px 24px color-mix(in srgb, var(--orange-800) 18%, transparent);"
+>
+	<div class="flex items-center justify-center">
+		<img src={iconSrc} alt="" class="block h-auto w-[clamp(4.6rem,18vw,7.2rem)]" />
+	</div>
+	<h2 class="m-0 text-[2rem] font-extrabold uppercase leading-none text-[var(--orange-600)]">{title}</h2>
+	<p class="m-0 max-w-[18rem] text-balance text-[1.28rem] font-medium leading-[1.18] text-[#2f4b73]">{description}</p>
+	<a
+		href={buttonHref}
+		class="mt-auto inline-flex items-center justify-center rounded-[0.45rem] bg-[var(--orange-600)] px-6 py-3 text-base font-bold uppercase leading-none tracking-[0.02em] text-[var(--cream-50)] no-underline transition duration-150 hover:-translate-y-0.5 hover:bg-[var(--orange-700)]"
+	>
+		{buttonLabel}
+	</a>
+</article>
