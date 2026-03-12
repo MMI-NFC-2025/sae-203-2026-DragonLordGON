@@ -1,0 +1,84 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getAllScenes } from "../js/backend.mjs";
+
+const title = "Scenes";
+const description = "Toutes les scenes du Flying Tap Fest";
+
+type SceneRecord = {
+	id: string;
+	Nom?: string;
+	Desc?: string;
+	IMG_Main?: string | string[];
+	Capa?: number;
+	collectionId?: string;
+	[key: string]: unknown;
+};
+
+type SceneCard = {
+	id: string;
+	name: string;
+	imageUrl: string | null;
+	capacityLabel: string;
+};
+
+function getMainImageUrl(record: SceneRecord): string | null {
+	const raw = record.IMG_Main;
+	const fileName = Array.isArray(raw) ? raw[0] : raw;
+
+	if (!fileName || !record.collectionId || !record.id) {
+		return null;
+	}
+
+	return `https://sae203tapdance.merlinhenry.fr/api/files/${record.collectionId}/${record.id}/${fileName}`;
+}
+
+let scenes: SceneRecord[] = [];
+let loadErrorMessage = "";
+
+try {
+	scenes = (await getAllScenes()) as SceneRecord[];
+} catch (error) {
+	console.error("Erreur lors du chargement des scenes:", error);
+	loadErrorMessage = "Impossible de charger les scenes depuis PocketBase.";
+}
+
+const cards: SceneCard[] = scenes.map((scene) => ({
+	id: scene.id,
+	name: scene.Nom || "Scene sans nom",
+	imageUrl: getMainImageUrl(scene),
+	capacityLabel: typeof scene.Capa === "number" ? `${scene.Capa} places` : "Capacite a confirmer",
+}));
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto w-full max-w-6xl space-y-10 pt-2 md:space-y-12">
+		<p class="text-center text-lg font-semibold text-[var(--orange-700)]">
+			Decouvrez les differentes scenes du Flying Tap Fest.
+		</p>
+
+		{loadErrorMessage ? (
+			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
+		) : null}
+
+		{cards.length === 0 ? (
+			<p class="text-center text-lg text-[var(--orange-800)]/80">Aucune scene disponible pour le moment.</p>
+		) : (
+			<div class="mt-2 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+				{cards.map((card) => (
+					<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+						{card.imageUrl ? <img src={card.imageUrl} alt={`Image de la scene ${card.name}`} class="h-44 w-full object-cover" loading="lazy" /> : null}
+
+						<div class="space-y-3 p-4">
+							<h2 class="text-xl font-bold text-[var(--orange-800)]">{card.name}</h2>
+							<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">{card.capacityLabel}</p>
+							<a href={`/scenes/${card.id}`} class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] no-underline transition-colors hover:bg-[var(--orange-700)]">
+								Voir la scene
+							</a>
+						</div>
+					</article>
+				))}
+			</div>
+		)}
+	</section>
+</Layout>

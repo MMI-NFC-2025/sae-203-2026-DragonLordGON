@@ -1,0 +1,285 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getAllArtistesByDate, getSceneById } from "../js/backend.mjs";
+
+const title = "Artistes";
+const description = "Decouvrez les artistes du festival";
+
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	day: "2-digit",
+	month: "2-digit",
+});
+
+const hourFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	hour: "2-digit",
+	minute: "2-digit",
+});
+
+type ArtisteRecord = {
+	id: string;
+	Nom?: string;
+	Desc?: string;
+	Date_Rep?: string;
+	Scene?: string;
+	IMG_Main?: string | string[];
+	collectionId?: string;
+	[key: string]: unknown;
+};
+
+type SceneRecord = {
+	id: string;
+	Nom?: string;
+	[key: string]: unknown;
+};
+
+type ArtistCard = {
+	id: string;
+	name: string;
+	imageUrl: string | null;
+	sceneName: string;
+	day: number | null;
+	month: number | null;
+	hourLabel: string;
+	dateLabel: string;
+};
+
+function getMainImageUrl(record: ArtisteRecord): string | null {
+	const raw = record.IMG_Main;
+	const fileName = Array.isArray(raw) ? raw[0] : raw;
+
+	if (!fileName || !record.collectionId || !record.id) {
+		return null;
+	}
+
+	return `https://sae203tapdance.merlinhenry.fr/api/files/${record.collectionId}/${record.id}/${fileName}`;
+}
+
+function getParisDateParts(dateValue: string | undefined) {
+	if (!dateValue) {
+		return null;
+	}
+
+	const parsed = new Date(dateValue);
+
+	if (Number.isNaN(parsed.getTime())) {
+		return null;
+	}
+
+	const parts = new Intl.DateTimeFormat("fr-FR", {
+		timeZone: "Europe/Paris",
+		day: "numeric",
+		month: "numeric",
+	}).formatToParts(parsed);
+
+	const day = Number(parts.find((part) => part.type === "day")?.value);
+	const month = Number(parts.find((part) => part.type === "month")?.value);
+
+	if (!day || !month) {
+		return null;
+	}
+
+	return { parsed, day, month };
+}
+
+function normalizeText(value: string) {
+	return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+let artistes: ArtisteRecord[] = [];
+let loadErrorMessage = "";
+
+try {
+	artistes = (await getAllArtistesByDate()) as ArtisteRecord[];
+} catch (error) {
+	console.error("Erreur lors du chargement des artistes:", error);
+	loadErrorMessage = "Impossible de charger les artistes depuis PocketBase.";
+}
+
+const uniqueSceneIds = [...new Set(artistes.map((artiste) => artiste.Scene).filter(Boolean))];
+const sceneResults: [string, SceneRecord | null][] = await Promise.all(
+	uniqueSceneIds.map(async (sceneId) => {
+		try {
+			const scene = (await getSceneById(sceneId)) as SceneRecord;
+			return [sceneId, scene] as [string, SceneRecord];
+		} catch {
+			return [sceneId, null] as [string, null];
+		}
+	}),
+);
+
+const sceneMap = new Map(sceneResults);
+const cards: ArtistCard[] = artistes.map((artiste) => {
+	const dateParts = getParisDateParts(artiste.Date_Rep);
+	const scene = artiste.Scene ? sceneMap.get(artiste.Scene) : null;
+
+	return {
+		id: artiste.id,
+		name: artiste.Nom || "Artiste sans nom",
+		imageUrl: getMainImageUrl(artiste),
+		sceneName: scene?.Nom || "Scene a confirmer",
+		day: dateParts?.day ?? null,
+		month: dateParts?.month ?? null,
+		hourLabel: dateParts ? hourFormatter.format(dateParts.parsed) : "Horaire a confirmer",
+		dateLabel: dateParts ? dateFormatter.format(dateParts.parsed) : "Date a confirmer",
+	};
+});
+
+const dayQuery = Astro.url.searchParams.get("day");
+const selectedDay = dayQuery === "6" || dayQuery === "7" ? dayQuery : "all";
+
+const q = (Astro.url.searchParams.get("q") || "").trim();
+const normalizedSearch = normalizeText(q);
+
+const filteredCards = cards.filter((card) => {
+	const isJune6 = card.month === 6 && card.day === 6;
+	const isJune7 = card.month === 6 && card.day === 7;
+
+	const dayMatch = selectedDay === "all" || (selectedDay === "6" && isJune6) || (selectedDay === "7" && isJune7);
+	const searchMatch = !normalizedSearch || normalizeText(card.name).includes(normalizedSearch);
+
+	return dayMatch && searchMatch;
+});
+
+const cardsJune6 = filteredCards.filter((card) => card.month === 6 && card.day === 6);
+const cardsJune7 = filteredCards.filter((card) => card.month === 6 && card.day === 7);
+
+const showJune6Section = selectedDay === "all" || selectedDay === "6";
+const showJune7Section = selectedDay === "all" || selectedDay === "7";
+
+const filterButtons = [
+	{ label: "6 juin", value: "6" },
+	{ label: "7 juin", value: "7" },
+	{ label: "Tous", value: "all" },
+];
+
+function buildFilterHref(dayValue: string) {
+	const params = new URLSearchParams();
+
+	if (dayValue !== "all") {
+		params.set("day", dayValue);
+	}
+
+	if (q) {
+		params.set("q", q);
+	}
+
+	const query = params.toString();
+	return query ? `${Astro.url.pathname}?${query}#artistes-filtres` : `${Astro.url.pathname}#artistes-filtres`;
+}
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto w-full max-w-6xl space-y-12 pt-3 md:space-y-14">
+		<p class="text-center text-lg font-semibold text-[var(--orange-700)] md:mt-2">
+			Retrouvez tous les artistes presents au Flying Tap Fest.
+		</p>
+
+		<nav id="artistes-filtres" class="flex flex-wrap items-center justify-center gap-10 pt-1" aria-label="Filtrer les artistes par jour">
+			{filterButtons.map((button) => {
+				const isActive = selectedDay === button.value;
+
+				return (
+					<a
+						href={buildFilterHref(button.value)}
+						class:list={[
+							"inline-flex items-center border-b-[3px] pb-1 text-[2rem] font-extrabold uppercase tracking-[0.01em] no-underline transition-colors",
+							isActive
+								? "border-[var(--orange-600)] text-[var(--orange-600)]"
+								: "border-transparent text-slate-500 hover:text-slate-600",
+						]}
+					>
+						{button.label}
+					</a>
+				);
+			})}
+		</nav>
+
+		<form method="get" action={Astro.url.pathname} class="mx-auto mt-4 flex w-full max-w-6xl items-center gap-3">
+			{selectedDay !== "all" ? <input type="hidden" name="day" value={selectedDay} /> : null}
+			<input
+				type="search"
+				name="q"
+				value={q}
+				placeholder="Rechercher un artiste"
+				class="min-w-0 flex-1 rounded-xl border border-[var(--orange-700)]/25 bg-white px-4 py-3 text-sm font-semibold text-[var(--orange-800)] shadow-[0_6px_18px_rgba(0,0,0,0.08)] outline-none focus:border-[var(--orange-600)]"
+			/>
+			<button type="submit" class="shrink-0 rounded-md bg-[var(--orange-600)] px-5 py-3 text-sm font-bold text-[var(--cream-50)] transition-colors hover:bg-[var(--orange-700)]">
+				Rechercher
+			</button>
+		</form>
+
+		{loadErrorMessage && (
+			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
+		)}
+
+		{showJune6Section ? (
+			<div class="space-y-6 pt-10 md:pt-12">
+				<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">6 juin</h2>
+
+				{cardsJune6.length === 0 ? (
+					<p class="text-center text-lg text-[var(--orange-800)]/80">Aucun artiste pour ce filtre le 6 juin.</p>
+				) : (
+					<div class="mt-4 mb-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3 md:mb-12">
+						{cardsJune6.map((card) => (
+							<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+								{card.imageUrl ? (
+									<img src={card.imageUrl} alt={`Photo de ${card.name}`} class="h-44 w-full object-cover" loading="lazy" />
+								) : (
+									<div class="flex h-44 w-full items-center justify-center bg-[var(--sand-200)] text-sm font-semibold uppercase tracking-[0.08em] text-[var(--orange-700)]/80">
+										Image indisponible
+									</div>
+								)}
+
+								<div class="space-y-3 p-4">
+									<h3 class="text-xl font-bold text-[var(--orange-800)]">{card.name}</h3>
+									<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">
+										{card.dateLabel} • {card.hourLabel} • {card.sceneName}
+									</p>
+									<a href={`/artistes/${card.id}`} class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] no-underline transition-colors hover:bg-[var(--orange-700)]">
+										Voir l'artiste
+									</a>
+								</div>
+							</article>
+						))}
+					</div>
+				)}
+			</div>
+		) : null}
+
+		{showJune7Section ? (
+			<div class="space-y-6 pt-14 md:pt-20">
+				<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">7 juin</h2>
+
+				{cardsJune7.length === 0 ? (
+					<p class="text-center text-lg text-[var(--orange-800)]/80">Aucun artiste pour ce filtre le 7 juin.</p>
+				) : (
+					<div class="mt-4 mb-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3 md:mb-12">
+						{cardsJune7.map((card) => (
+							<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+								{card.imageUrl ? (
+									<img src={card.imageUrl} alt={`Photo de ${card.name}`} class="h-44 w-full object-cover" loading="lazy" />
+								) : (
+									<div class="flex h-44 w-full items-center justify-center bg-[var(--sand-200)] text-sm font-semibold uppercase tracking-[0.08em] text-[var(--orange-700)]/80">
+										Image indisponible
+									</div>
+								)}
+
+								<div class="space-y-3 p-4">
+									<h3 class="text-xl font-bold text-[var(--orange-800)]">{card.name}</h3>
+									<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">
+										{card.dateLabel} • {card.hourLabel} • {card.sceneName}
+									</p>
+									<a href={`/artistes/${card.id}`} class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] no-underline transition-colors hover:bg-[var(--orange-700)]">
+										Voir l'artiste
+									</a>
+								</div>
+							</article>
+						))}
+					</div>
+				)}
+			</div>
+		) : null}
+	</section>
+</Layout>

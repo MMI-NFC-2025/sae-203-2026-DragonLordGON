@@ -1,0 +1,97 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getArtisteById, getSceneById } from "../../js/backend.mjs";
+
+const artistId = Astro.params.id || "";
+
+type ArtisteRecord = {
+	id: string;
+	Nom?: string;
+	Desc?: string;
+	Date_Rep?: string;
+	Scene?: string;
+	IMG_Main?: string | string[];
+	IMG_Sub?: string[];
+	collectionId?: string;
+	[key: string]: unknown;
+};
+
+type SceneRecord = {
+	id: string;
+	Nom?: string;
+	[key: string]: unknown;
+};
+
+function getFileUrl(record: ArtisteRecord, fileName: string) {
+	if (!record.collectionId || !record.id || !fileName) {
+		return null;
+	}
+
+	return `https://sae203tapdance.merlinhenry.fr/api/files/${record.collectionId}/${record.id}/${fileName}`;
+}
+
+function getMainImageUrl(record: ArtisteRecord) {
+	const mainRaw = record.IMG_Main;
+	const fileName = Array.isArray(mainRaw) ? mainRaw[0] : mainRaw;
+	return fileName ? getFileUrl(record, fileName) : null;
+}
+
+let artiste: ArtisteRecord | null = null;
+let scene: SceneRecord | null = null;
+
+try {
+	artiste = (await getArtisteById(artistId)) as ArtisteRecord;
+	if (artiste?.Scene) {
+		scene = (await getSceneById(artiste.Scene)) as SceneRecord;
+	}
+} catch (error) {
+	console.error("Erreur chargement artiste:", error);
+	Astro.response.status = 404;
+}
+
+const title = artiste?.Nom || "Artiste introuvable";
+const description = artiste?.Nom ? `Detail de ${artiste.Nom}` : "Artiste introuvable";
+
+const subImageUrls = artiste?.IMG_Sub?.map((fileName) => getFileUrl(artiste as ArtisteRecord, fileName)).filter(Boolean) || [];
+const mainImageUrl = artiste ? getMainImageUrl(artiste) : null;
+const hasSubImages = subImageUrls.length > 0;
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto w-full max-w-6xl space-y-10 pt-2 md:space-y-12">
+		{!artiste ? (
+			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">Cet artiste est introuvable.</p>
+		) : (
+			<>
+				<div class="space-y-3 pt-2">
+					<p class="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--orange-700)]">
+						{scene?.Nom || "Scene a confirmer"}
+					</p>
+					<h2 class="text-4xl font-extrabold text-[var(--orange-700)]">{artiste.Nom}</h2>
+				</div>
+
+				<div class:list={["grid gap-6 lg:gap-8", hasSubImages ? "lg:grid-cols-2" : "grid-cols-1"]}>
+					{mainImageUrl ? <img src={mainImageUrl} alt={`Image principale de ${artiste.Nom}`} class:list={["w-full rounded-xl object-cover", hasSubImages ? "h-[360px]" : "h-[420px] md:h-[520px]"]} /> : null}
+
+					{hasSubImages ? (
+						<div class="grid grid-cols-2 gap-4">
+							{subImageUrls.map((subImageUrl, index) => (
+								<img src={subImageUrl} alt={`Image secondaire ${index + 1} de ${artiste.Nom}`} class="h-[172px] w-full rounded-xl object-cover" loading="lazy" />
+							))}
+						</div>
+					) : null}
+				</div>
+
+				<div class="space-y-4 rounded-xl bg-white p-6 shadow-[0_8px_22px_rgba(0,0,0,0.08)] md:p-7">
+					<h3 class="text-2xl font-bold text-[var(--orange-700)]">Description</h3>
+					<div class="space-y-3 text-base leading-relaxed text-[var(--orange-800)]/90 [&_p]:m-0 [&_strong]:font-bold" set:html={artiste.Desc || "Aucune description disponible."} />
+					{scene?.id ? (
+						<a href={`/scenes/${scene.id}`} class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-4 py-2 text-sm font-bold text-[var(--cream-50)] no-underline transition-colors hover:bg-[var(--orange-700)]">
+							Voir la scene de cet artiste
+						</a>
+					) : null}
+				</div>
+			</>
+		)}
+	</section>
+</Layout>

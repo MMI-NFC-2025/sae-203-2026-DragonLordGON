@@ -1,0 +1,113 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getSceneById, getArtistesBySceneId } from "../../js/backend.mjs";
+
+const sceneId = Astro.params.id || "";
+
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	day: "2-digit",
+	month: "2-digit",
+});
+
+const hourFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	hour: "2-digit",
+	minute: "2-digit",
+});
+
+type SceneRecord = {
+	id: string;
+	Nom?: string;
+	Desc?: string;
+	IMG_Main?: string | string[];
+	Capa?: number;
+	Localisation?: { lat?: number; lng?: number };
+	collectionId?: string;
+	[key: string]: unknown;
+};
+
+type ArtisteRecord = {
+	id: string;
+	Nom?: string;
+	Date_Rep?: string;
+	IMG_Main?: string | string[];
+	collectionId?: string;
+	[key: string]: unknown;
+};
+
+function getFileUrl(record: { id: string; collectionId?: string }, file: string | string[] | undefined) {
+	const fileName = Array.isArray(file) ? file[0] : file;
+	if (!fileName || !record.collectionId || !record.id) {
+		return null;
+	}
+	return `https://sae203tapdance.merlinhenry.fr/api/files/${record.collectionId}/${record.id}/${fileName}`;
+}
+
+let scene: SceneRecord | null = null;
+let artists: ArtisteRecord[] = [];
+
+try {
+	scene = (await getSceneById(sceneId)) as SceneRecord;
+	artists = (await getArtistesBySceneId(sceneId)) as ArtisteRecord[];
+} catch (error) {
+	console.error("Erreur chargement scene:", error);
+	Astro.response.status = 404;
+}
+
+const title = scene?.Nom ? `Scene: ${scene.Nom}` : "Scene introuvable";
+const description = scene?.Nom ? `Details de la scene ${scene.Nom}` : "Scene introuvable";
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto w-full max-w-6xl space-y-10 pt-2 md:space-y-12">
+		{!scene ? (
+			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">Cette scene est introuvable.</p>
+		) : (
+			<>
+				<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">{scene.Nom}</h2>
+
+				{getFileUrl(scene, scene.IMG_Main) ? <img src={getFileUrl(scene, scene.IMG_Main)} alt={`Image de la scene ${scene.Nom}`} class="h-[340px] w-full rounded-xl object-cover" /> : null}
+
+				<div class="space-y-4 rounded-xl bg-white p-6 shadow-[0_8px_22px_rgba(0,0,0,0.08)] md:p-7">
+					<h3 class="text-2xl font-bold text-[var(--orange-700)]">Description</h3>
+					<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-800)]">
+						Nombre de place : {typeof scene.Capa === "number" ? `${scene.Capa} places` : "capacite a confirmer"}
+					</p>
+					<div class="space-y-3 text-base leading-relaxed text-[var(--orange-800)]/90 [&_p]:m-0 [&_strong]:font-bold" set:html={scene.Desc || "Aucune description disponible."} />
+				</div>
+
+				<div class="space-y-6 pt-2">
+					<h3 class="text-3xl font-extrabold text-[var(--orange-700)]">Artistes sur cette scene</h3>
+
+					{artists.length === 0 ? (
+						<p class="text-lg text-[var(--orange-800)]/80">Aucun artiste programme pour cette scene.</p>
+					) : (
+						<div class="mt-2 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+							{artists.map((artist) => {
+								const parsedDate = artist.Date_Rep ? new Date(artist.Date_Rep) : null;
+								const hasDate = parsedDate && !Number.isNaN(parsedDate.getTime());
+
+								return (
+									<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+										{getFileUrl(artist, artist.IMG_Main) ? <img src={getFileUrl(artist, artist.IMG_Main)} alt={`Image de ${artist.Nom || "artiste"}`} class="h-44 w-full object-cover" loading="lazy" /> : null}
+
+										<div class="space-y-3 p-4">
+											<h4 class="text-xl font-bold text-[var(--orange-800)]">{artist.Nom || "Artiste sans nom"}</h4>
+											<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">
+												{hasDate ? `${dateFormatter.format(parsedDate as Date)} • ${hourFormatter.format(parsedDate as Date)}` : "Date a confirmer"}
+											</p>
+											<a href={`/artistes/${artist.id}`} class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] no-underline transition-colors hover:bg-[var(--orange-700)]">
+												Voir l'artiste
+											</a>
+										</div>
+									</article>
+								);
+							})}
+						</div>
+					)}
+				</div>
+			</>
+		)}
+	</section>
+</Layout>

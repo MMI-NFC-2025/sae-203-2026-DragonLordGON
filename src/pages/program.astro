@@ -1,0 +1,239 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getAllArtistesByDate, getSceneById } from "../js/backend.mjs";
+
+const title = "Programme";
+const description = "Programme du festival des 6 et 7 juin 2026";
+
+const parisPartsFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	day: "numeric",
+	month: "numeric",
+	year: "numeric",
+});
+
+const hourFormatter = new Intl.DateTimeFormat("fr-FR", {
+	timeZone: "Europe/Paris",
+	hour: "2-digit",
+	minute: "2-digit",
+});
+
+type ArtisteRecord = {
+	id: string;
+	Nom?: string;
+	Desc?: string;
+	Date_Rep?: string;
+	Scene?: string;
+	IMG_Main?: string | string[];
+	[key: string]: unknown;
+};
+
+type SceneRecord = {
+	id: string;
+	Nom?: string;
+	[key: string]: unknown;
+};
+
+type ProgramCard = {
+	id: string;
+	title: string;
+	description: string;
+	imageUrl: string | null;
+	hour: string;
+	day: number | null;
+	month: number | null;
+	year: number | null;
+	sceneName: string;
+};
+
+function getMainImageUrl(record: ArtisteRecord): string | null {
+	const raw = record.IMG_Main;
+	const fileName = Array.isArray(raw) ? raw[0] : raw;
+
+	if (!fileName) {
+		return null;
+	}
+
+	const collectionId = String(record.collectionId || "");
+	const recordId = String(record.id || "");
+
+	if (!collectionId || !recordId) {
+		return null;
+	}
+
+	return `https://sae203tapdance.merlinhenry.fr/api/files/${collectionId}/${recordId}/${fileName}`;
+}
+
+function getParisDateParts(dateValue: string | undefined) {
+	if (!dateValue) {
+		return null;
+	}
+
+	const parsed = new Date(dateValue);
+
+	if (Number.isNaN(parsed.getTime())) {
+		return null;
+	}
+
+	const parts = parisPartsFormatter.formatToParts(parsed);
+	const day = Number(parts.find((part) => part.type === "day")?.value);
+	const month = Number(parts.find((part) => part.type === "month")?.value);
+	const year = Number(parts.find((part) => part.type === "year")?.value);
+
+	if (!day || !month || !year) {
+		return null;
+	}
+
+	return { parsed, day, month, year };
+}
+
+function buildProgramCard(record: ArtisteRecord, sceneMap: Map<string, SceneRecord | null>): ProgramCard {
+	const dateParts = getParisDateParts(record.Date_Rep);
+	const scene = record.Scene ? sceneMap.get(record.Scene) : null;
+
+	return {
+		id: record.id,
+		title: record.Nom || "Show sans titre",
+		description: record.Desc || "Aucune description disponible.",
+		imageUrl: getMainImageUrl(record),
+		hour: dateParts ? hourFormatter.format(dateParts.parsed) : "Horaire a confirmer",
+		day: dateParts?.day ?? null,
+		month: dateParts?.month ?? null,
+		year: dateParts?.year ?? null,
+		sceneName: scene?.Nom || "Scene a confirmer",
+	};
+}
+
+let artistes: ArtisteRecord[] = [];
+let loadErrorMessage = "";
+
+try {
+	artistes = (await getAllArtistesByDate()) as ArtisteRecord[];
+} catch (error) {
+	console.error("Erreur lors du chargement du programme:", error);
+	loadErrorMessage = "Impossible de charger le programme depuis PocketBase (droits d'acces insuffisants).";
+}
+
+const uniqueSceneIds = [...new Set(artistes.map((artiste) => artiste.Scene).filter(Boolean))];
+const sceneResults: [string, SceneRecord | null][] = await Promise.all(
+	uniqueSceneIds.map(async (sceneId) => {
+		try {
+			const scene = (await getSceneById(sceneId)) as SceneRecord;
+			return [sceneId, scene] as [string, SceneRecord];
+		} catch {
+			return [sceneId, null] as [string, null];
+		}
+	}),
+);
+
+const sceneMap = new Map(sceneResults);
+const programCards = artistes.map((artiste) => buildProgramCard(artiste, sceneMap));
+
+const showsJune6 = programCards.filter((show) => show.month === 6 && show.day === 6);
+const showsJune7 = programCards.filter((show) => show.month === 6 && show.day === 7);
+
+const dayQuery = Astro.url.searchParams.get("day");
+const selectedDay = dayQuery === "6" || dayQuery === "7" ? dayQuery : "all";
+const showJune6Section = selectedDay === "all" || selectedDay === "6";
+const showJune7Section = selectedDay === "all" || selectedDay === "7";
+
+const filterButtons = [
+	{ label: "6 juin", value: "6" },
+	{ label: "7 juin", value: "7" },
+	{ label: "Tous", value: "all" },
+];
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto w-full max-w-6xl space-y-14">
+		<p class="text-center text-lg font-semibold text-[var(--orange-700)]">
+			Decouvrez les performances qui rythmeront le Flying Tap Fest.
+		</p>
+
+		<nav id="programme-filtres" class="flex flex-wrap items-center justify-center gap-10" aria-label="Filtrer les jours du programme">
+			{filterButtons.map((button) => {
+				const isActive = selectedDay === button.value;
+				const href =
+					button.value === "all"
+						? `${Astro.url.pathname}#programme-filtres`
+						: `${Astro.url.pathname}?day=${button.value}#programme-filtres`;
+
+				return (
+					<a
+						href={href}
+						class:list={[
+							"inline-flex items-center border-b-[3px] pb-1 text-[2rem] font-extrabold uppercase tracking-[0.01em] no-underline transition-colors",
+							isActive
+								? "border-[var(--orange-600)] text-[var(--orange-600)]"
+								: "border-transparent text-slate-500 hover:text-slate-600",
+						]}
+					>
+						{button.label}
+					</a>
+				);
+			})}
+		</nav>
+
+		{loadErrorMessage ? (
+			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
+		) : null}
+
+		{showJune6Section ? (
+		<div class="p-0">
+			<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">6 juin</h2>
+
+			{showsJune6.length === 0 ? (
+				<p class="mt-4 text-lg text-[var(--orange-800)]/80">Aucun show programme pour le 6 juin.</p>
+			) : (
+				<div class="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+					{showsJune6.map((show) => (
+						<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+							{show.imageUrl ? <img src={show.imageUrl} alt={`Image du show ${show.title}`} class="h-44 w-full object-cover" loading="lazy" /> : null}
+
+							<div class="space-y-3 p-4">
+								<h3 class="text-xl font-bold text-[var(--orange-800)]">{show.title}</h3>
+								<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">
+									{show.hour} • {show.sceneName}
+								</p>
+
+								<button type="button" class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] transition-colors hover:bg-[var(--orange-700)]">
+									En savoir plus
+								</button>
+							</div>
+						</article>
+					))}
+				</div>
+			)}
+		</div>
+		) : null}
+
+		{showJune7Section ? (
+		<div class="p-0">
+			<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">7 juin</h2>
+
+			{showsJune7.length === 0 ? (
+				<p class="mt-4 text-lg text-[var(--orange-800)]/80">Aucun show programme pour le 7 juin.</p>
+			) : (
+				<div class="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+					{showsJune7.map((show) => (
+						<article class="overflow-hidden rounded-xl border border-[var(--orange-700)]/20 bg-white shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+							{show.imageUrl ? <img src={show.imageUrl} alt={`Image du show ${show.title}`} class="h-44 w-full object-cover" loading="lazy" /> : null}
+
+							<div class="space-y-3 p-4">
+								<h3 class="text-xl font-bold text-[var(--orange-800)]">{show.title}</h3>
+								<p class="text-sm font-semibold uppercase tracking-[0.06em] text-[var(--orange-700)]">
+									{show.hour} • {show.sceneName}
+								</p>
+
+								<button type="button" class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-3 py-2 text-sm font-bold text-[var(--cream-50)] transition-colors hover:bg-[var(--orange-700)]">
+									En savoir plus
+								</button>
+							</div>
+						</article>
+					))}
+				</div>
+			)}
+		</div>
+		) : null}
+	</section>
+</Layout>
