@@ -105,13 +105,10 @@ function buildProgramCard(record: ArtisteRecord, sceneMap: Map<string, SceneReco
 }
 
 let artistes: ArtisteRecord[] = [];
-let loadErrorMessage = "";
-
 try {
 	artistes = (await getAllArtistesByDate()) as ArtisteRecord[];
 } catch (error) {
 	console.error("Erreur lors du chargement du programme:", error);
-	loadErrorMessage = "Impossible de charger le programme depuis PocketBase (droits d'acces insuffisants).";
 }
 
 const uniqueSceneIds = [...new Set(artistes.map((artiste) => artiste.Scene).filter(Boolean))];
@@ -174,10 +171,6 @@ const filterButtons = [
 			})}
 		</nav>
 
-		{loadErrorMessage ? (
-			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
-		) : null}
-
 		{showJune6Section ? (
 		<div class="p-0">
 			<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">6 juin</h2>
@@ -235,5 +228,11 @@ const filterButtons = [
 			)}
 		</div>
 		) : null}
+
+		<div class="flex justify-center pt-2">
+			<button type="button" class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-6 py-3 text-sm font-extrabold uppercase tracking-[0.06em] text-[var(--cream-50)] transition-colors hover:bg-[var(--orange-700)]">
+				Télécharger le programme
+			</button>
+		</div>
 	</section>
 </Layout>

@@ -34,13 +34,10 @@ function getMainImageUrl(record: SceneRecord): string | null {
 }
 
 let scenes: SceneRecord[] = [];
-let loadErrorMessage = "";
-
 try {
 	scenes = (await getAllScenes()) as SceneRecord[];
 } catch (error) {
 	console.error("Erreur lors du chargement des scenes:", error);
-	loadErrorMessage = "Impossible de charger les scenes depuis PocketBase.";
 }
 
 const cards: SceneCard[] = scenes.map((scene) => ({
@@ -56,10 +53,6 @@ const cards: SceneCard[] = scenes.map((scene) => ({
 		<p class="text-center text-lg font-semibold text-[var(--orange-700)]">
 			Decouvrez les differentes scenes du Flying Tap Fest.
 		</p>
-
-		{loadErrorMessage ? (
-			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
-		) : null}
 
 		{cards.length === 0 ? (
 			<p class="text-center text-lg text-[var(--orange-800)]/80">Aucune scene disponible pour le moment.</p>

@@ -1,0 +1,42 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const title = "Mentions legales";
+const description = "Informations legales du site Flying Tap Fest.";
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto flex w-full max-w-4xl flex-col items-center gap-12 py-10 text-center">
+		<header class="space-y-5">
+			<h1 class="text-4xl font-extrabold text-[var(--orange-600)] md:text-5xl">Mentions legales</h1>
+			<p class="text-lg text-[var(--orange-800)]/90 md:text-xl">Informations legales du site Flying Tap Fest.</p>
+			<p class="text-base text-[var(--orange-800)]/90 md:text-lg">Toutes les informations legales du site Flying Tap Fest, presentees simplement.</p>
+		</header>
+
+		<div class="space-y-10">
+			<section class="space-y-2">
+				<h2 class="text-3xl font-extrabold text-[var(--orange-600)] md:text-4xl">Editeur du site</h2>
+				<p class="text-lg text-[var(--orange-800)]/90 md:text-xl">Flying Tap Fest - Projet pedagogique (SAE 105).</p>
+			</section>
+
+			<section class="space-y-2">
+				<h2 class="text-3xl font-extrabold text-[var(--orange-600)] md:text-4xl">Responsable de publication</h2>
+				<p class="text-lg text-[var(--orange-800)]/90 md:text-xl">Equipe pedagogique BUT MMI - Universite de Franche-Comte.</p>
+			</section>
+
+			<section class="space-y-2">
+				<h2 class="text-3xl font-extrabold text-[var(--orange-600)] md:text-4xl">Hebergement</h2>
+				<p class="text-lg text-[var(--orange-800)]/90 md:text-xl">Netlify, Inc. - San Francisco, CA, USA.</p>
+			</section>
+
+			<section class="space-y-2">
+				<h2 class="text-3xl font-extrabold text-[var(--orange-600)] md:text-4xl">Contact</h2>
+				<p class="text-lg text-[var(--orange-800)]/90 md:text-xl">contact@flyingtapfest.fr</p>
+			</section>
+		</div>
+
+		<a href="/" class="inline-flex items-center rounded-md bg-[var(--orange-600)] px-8 py-3 text-base font-bold uppercase tracking-[0.03em] text-[var(--cream-50)] no-underline mt-8 transition-colors hover:bg-[var(--orange-700)]">
+			Revenir a l'accueil
+		</a>
+	</section>
+</Layout>

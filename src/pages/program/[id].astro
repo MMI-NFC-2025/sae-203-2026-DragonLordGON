@@ -75,9 +75,7 @@ if (artiste?.Date_Rep) {
 
 <Layout title={title} description={description}>
 	<section class="mx-auto w-full max-w-5xl space-y-8">
-		{!artiste ? (
-			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">Ce show est introuvable.</p>
-		) : (
+		{artiste ? (
 			<>
 				<h2 class="text-center text-5xl font-extrabold uppercase tracking-[0.01em] text-[var(--orange-600)]">{artiste.Nom}</h2>
 
@@ -100,6 +98,6 @@ if (artiste?.Date_Rep) {
 					<div class="space-y-3 text-base leading-relaxed text-[var(--orange-800)]/90 [&_p]:m-0 [&_strong]:font-bold" set:html={artiste.Desc || "Aucune description disponible."} />
 				</div>
 			</>
-		)}
+		) : null}
 	</section>
 </Layout>

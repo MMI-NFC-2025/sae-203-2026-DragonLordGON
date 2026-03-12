@@ -88,13 +88,10 @@ function normalizeText(value: string) {
 }
 
 let artistes: ArtisteRecord[] = [];
-let loadErrorMessage = "";
-
 try {
 	artistes = (await getAllArtistesByDate()) as ArtisteRecord[];
 } catch (error) {
 	console.error("Erreur lors du chargement des artistes:", error);
-	loadErrorMessage = "Impossible de charger les artistes depuis PocketBase.";
 }
 
 const uniqueSceneIds = [...new Set(artistes.map((artiste) => artiste.Scene).filter(Boolean))];
@@ -209,10 +206,6 @@ function buildFilterHref(dayValue: string) {
 				Rechercher
 			</button>
 		</form>
-
-		{loadErrorMessage && (
-			<p class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{loadErrorMessage}</p>
-		)}
 
 		{showJune6Section ? (
 			<div class="space-y-6 pt-10 md:pt-12">

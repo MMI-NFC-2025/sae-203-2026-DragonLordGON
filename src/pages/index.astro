@@ -23,7 +23,7 @@ const tilesNeeded = Math.ceil(MAX_VIEWPORT / TILE_WIDTH) + 1;
 const bottomTiles = Array.from({ length: tilesNeeded });
 
 const navLinks = [
-	{ label: "Accueil", href: "/index" },
+	{ label: "Accueil", href: "/" },
 	{ label: "Le festival", href: "/about" },
 	{ label: "Programme", href: "/program" },
 	{ label: "Artistes", href: "/artistes" },
@@ -99,7 +99,7 @@ const navLinks = [
 					title="Programme"
 					description="Consultez les concerts, ateliers et temps forts des deux jours"
 					buttonLabel="Voir le Programme"
-					buttonHref="/programme"
+					buttonHref="/program"
 					iconSrc={calendarIcon.src}
 				/>
 				<HomeCard

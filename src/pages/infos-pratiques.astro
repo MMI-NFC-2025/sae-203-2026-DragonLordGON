@@ -1,0 +1,152 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ticketIcon from "../assets/ticket.svg";
+import house from "../assets/heberg.svg";
+import transport from "../assets/transport.svg";
+import plusIcon from "../assets/plus.svg";
+
+const title = "Infos pratiques";
+const description = "Informations utiles pour preparer votre visite";
+---
+
+<Layout title={title} description={description}>
+	<section class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+		<div class="p-1 md:p-2">
+			<div class="flex items-center gap-3">
+				<img src={ticketIcon.src} alt="Icône billet" class="h-8 w-8" />
+				<h2 class="text-5xl font-extrabold text-[var(--orange-600)]">Tarifs</h2>
+			</div>
+			<p class="mt-4 text-base leading-relaxed text-[var(--orange-800)]/90">
+				Des tarifs accessibles pour profiter du festival en toute simplicité. 
+			</p>
+			<div class="mt-6 flex flex-wrap gap-4">
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Pass 1 jour :</span> 18€
+				</div>
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Pass 2 jours :</span> 30€
+				</div>
+			</div>
+		</div>
+
+		<div class="p-1 md:p-2">
+			<div class="flex items-center gap-3">
+				<img src={house.src} alt="Icône maison" class="h-8 w-8" />
+				<h2 class="text-5xl font-extrabold text-[var(--orange-600)]">Hébergement</h2>
+			</div>
+			<p class="mt-4 text-base leading-relaxed text-[var(--orange-800)]/90">
+				Plusieurs options d’hébergement sont disponibles à proximité du parc.  
+			</p>
+			<div class="mt-6 flex flex-wrap gap-4">
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Camping municipal :</span> À 10 minutes à pied du festival, idéal pour vivre l’expérience sur place.
+				</div>
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Hôtels partenaires :</span> Du 2★ au 4★, avec offres spéciales festival sur présentation de votre billet.
+				</div>
+			</div>
+		</div>
+
+		<div class="p-1 md:p-2">
+			<div class="flex items-center gap-3">
+				<img src={transport.src} alt="Icône transport" class="h-8 w-8" />
+				<h2 class="text-5xl font-extrabold text-[var(--orange-600)]">Transport</h2>
+			</div>
+			<p class="mt-4 text-base leading-relaxed text-[var(--orange-800)]/90">
+				Plusieurs options de transport permettent de rejoindre facilement le festival.  
+			</p>
+			<div class="mt-6 flex flex-wrap gap-4">
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Train :</span> Gare de Montbéliard à 15 minutes à pied du site du festival.
+				</div>
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Bus :</span> Lignes 1 et 3, arrêt “Parc” à proximité immédiate de l’entrée.
+				</div>
+				<div class="rounded-full bg-[var(--orange-600)] px-5 py-2 text-sm font-normal text-[var(--cream-50)]">
+					<span class="font-extrabold">Voiture :</span> Parking gratuit sur place, dans la limite des places disponibles.
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="mx-auto mt-12 w-full max-w-6xl space-y-4">
+		<h2 class="text-3xl font-extrabold text-[var(--orange-600)]">FAQ</h2>
+
+		<details class="faq-item rounded-lg p-4">
+			<summary class="flex list-none cursor-pointer items-center justify-between gap-4 text-base font-bold text-[var(--orange-700)] hover:text-[var(--orange-600)]">
+				<span>Les ateliers sont ils ouverts à tous ?</span>
+				<img src={plusIcon.src} alt="" class="faq-icon h-4 w-4 shrink-0" aria-hidden="true" />
+			</summary>
+			<div class="faq-drawer">
+				<div class="faq-drawer-inner">
+					<p class="faq-content mt-3 text-sm leading-relaxed text-[var(--orange-800)]/90">Oui, les ateliers sont ouverts à tous les festivaliers, dans la limite des places disponibles. Certains ateliers peuvent nécessiter une inscription sur place. </p>
+				</div>
+			</div>
+		</details>
+
+		<details class="faq-item rounded-lg p-4">
+			<summary class="flex list-none cursor-pointer items-center justify-between gap-4 text-base font-bold text-[var(--orange-700)] hover:text-[var(--orange-600)]">
+				<span>Le spectacle de drones est-il inclus dans le billet ?</span>
+				<img src={plusIcon.src} alt="" class="faq-icon h-4 w-4 shrink-0" aria-hidden="true" />
+			</summary>
+			<div class="faq-drawer">
+				<div class="faq-drawer-inner">
+					<p class="faq-content mt-3 text-sm leading-relaxed text-[var(--orange-800)]/90">Oui, le spectacle de drones est inclus dans tous les pass du festival. Il a lieu en fin de journée, sous réserve des conditions météo. </p>
+				</div>
+			</div>
+		</details>
+
+		<details class="faq-item rounded-lg p-4">
+			<summary class="flex list-none cursor-pointer items-center justify-between gap-4 text-base font-bold text-[var(--orange-700)] hover:text-[var(--orange-600)]">
+				<span> Peut-on venir avec des enfants ?</span>
+				<img src={plusIcon.src} alt="" class="faq-icon h-4 w-4 shrink-0" aria-hidden="true" />
+			</summary>
+			<div class="faq-drawer">
+				<div class="faq-drawer-inner">
+					<p class="faq-content mt-3 text-sm leading-relaxed text-[var(--orange-800)]/90">Bien sûr, le festival est ouvert aux familles. Certains espaces et horaires sont plus adaptés aux enfants : consultez le programme pour identifier les temps forts famille. </p>
+				</div>
+			</div>
+		</details>
+
+        <details class="faq-item rounded-lg p-4">
+			<summary class="flex list-none cursor-pointer items-center justify-between gap-4 text-base font-bold text-[var(--orange-700)] hover:text-[var(--orange-600)]">
+				<span>Le festival est-il accessible PMR ?</span>
+				<img src={plusIcon.src} alt="" class="faq-icon h-4 w-4 shrink-0" aria-hidden="true" />
+			</summary>
+			<div class="faq-drawer">
+				<div class="faq-drawer-inner">
+					<p class="faq-content mt-3 text-sm leading-relaxed text-[var(--orange-800)]/90">Oui, le site dispose de zones dédiées, d’allées adaptées et de sanitaires accessibles. Pour tout besoin spécifique, vous pouvez nous contacter en amont du festival. </p>
+				</div>
+			</div>
+		</details>
+	</section>
+</Layout>
+
+<style>
+	.faq-item .faq-icon {
+		transition: transform 180ms ease;
+	}
+
+	.faq-item[open] .faq-icon {
+		transform: rotate(45deg);
+	}
+
+	.faq-drawer {
+		display: block !important;
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+		transform: translateY(-4px);
+		transition: max-height 280ms ease, opacity 220ms ease, transform 220ms ease;
+	}
+
+	.faq-item[open] .faq-drawer {
+		max-height: 18rem;
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.faq-drawer-inner {
+		overflow: hidden;
+	}
+</style>
